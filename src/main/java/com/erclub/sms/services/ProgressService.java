@@ -1,7 +1,6 @@
 package com.erclub.sms.services;
 
 import com.erclub.sms.api.request.SaveProgressRequest;
-import com.erclub.sms.common.domain.STUDENT_CATEGORY;
 import com.erclub.sms.models.Progress;
 import com.erclub.sms.models.Student;
 import com.erclub.sms.repositories.ProgressRepository;
@@ -16,6 +15,8 @@ import java.util.stream.Collectors;
 public class ProgressService {
   private final ProgressRepository progressRepository;
   private final StudentService studentService;
+
+  private final static List<String> levels = Arrays.asList("A", "B", "C", "P", "D", "E", "F", "G", "H", "I", "J", "K");
 
   public ProgressService(ProgressRepository progressRepository, StudentService studentService) {
     this.progressRepository = progressRepository;
@@ -53,7 +54,11 @@ public class ProgressService {
   public void saveProgress(SaveProgressRequest request) {
     Progress progress = Progress.from(request.getStudentId());
     if (request.getProgresses().size() > 0) {
-      request.getProgresses().sort(String::compareTo);
+      request.getProgresses().sort((o1, o2) -> {
+        int levelIdx1 = levels.indexOf(o1.substring(0, 1));
+        int levelIdx2 = levels.indexOf(o2.substring(0, 1));
+        return Integer.compare(levelIdx1, levelIdx2);
+      });
       progress.setCurrentLevel(request.getProgresses().get(request.getProgresses().size() - 1));
       progress.setProgress(StringUtils.join(request.getProgresses(), ","));
     } else {
