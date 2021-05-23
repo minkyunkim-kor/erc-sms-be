@@ -33,12 +33,24 @@ public class UserService {
 
   public void saveUser(String userId, SaveUserRequest request) {
     checkAdmin(userId);
-    if (request.getIsNew() && userRepository.findByLoginId(request.getId()).isPresent()) {
-      throw new CommonException(BAD_REQUEST.value(), "duplicate id");
+    Optional<ErcUser> user = userRepository.findByLoginId(request.getId());
+    if (request.getIsNew()) {
+      if (user.isPresent()) {
+        throw new CommonException(BAD_REQUEST.value(), "duplicate id");
+      }
+      request.setPw(passwordEncoder.encode(request.getPw()));
+      ErcUser ercUser = ErcUser.from(request);
+      userRepository.save(ercUser);
+    } else {
+      if (!user.isPresent()) {
+        throw new CommonException(BAD_REQUEST.value(), "Not Exist User");
+      }
+      user.get().setLoginId(request.getId());
+      user.get().setPwd(passwordEncoder.encode(request.getPw()));
+      user.get().setName(request.getName());
+      user.get().setSuspendYn(request.getSuspendYn());
+      userRepository.save(user.get());
     }
-    request.setPw(passwordEncoder.encode(request.getPw()));
-    ErcUser ercUser = ErcUser.from(request);
-    userRepository.save(ercUser);
   }
 
   public ErcUser signIn(String id, String pwd) {
@@ -59,7 +71,7 @@ public class UserService {
 
   public void deleteUsers(String userId, String targetId) {
     checkAdmin(userId);
-    userRepository.deleteById(userId);
+    userRepository.deleteById(targetId);
   }
 
   private void checkAdmin(String userId) {
