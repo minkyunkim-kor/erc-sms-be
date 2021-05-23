@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LessonRepository extends JpaRepository<Lesson, String> {
-  @Query(value = "SELECT DISTINCT l FROM Lesson l left join fetch l.lessonDetails")
+  @Query(value = "SELECT DISTINCT l FROM Lesson l left join fetch l.lessonDetails where l.userId = ?1")
   Optional<List<Lesson>> findByUserIdWithDetail(String userId);
 
   Optional<Lesson> findByUserIdAndLessonId(String userId, String lessonId);

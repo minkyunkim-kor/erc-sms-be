@@ -18,6 +18,6 @@ public class SignInDto {
     token = ercUser.getToken();
     uid = ercUser.getUserId();
     role = ercUser.getRole();
-    name = ercUser.getRole();
+    name = ercUser.getName();
   }
 }
