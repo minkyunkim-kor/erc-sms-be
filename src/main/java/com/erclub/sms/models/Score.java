@@ -99,6 +99,7 @@ public class Score implements Cloneable {
 
   protected Score(String studentId) {
     this.studentId = studentId;
+    this.completed = false;
   }
 
   public static Score from(String studentId) {
