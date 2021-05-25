@@ -332,7 +332,7 @@ public class Api {
     long start = System.currentTimeMillis();
     List<ScoreDto> response = scoreService.getScores(userId, startDate, endDate)
         .stream()
-        .sorted(Comparator.comparing(Score::getTargetDate).reversed())
+        .sorted(Comparator.comparing(Score::getTargetDate).reversed().thenComparing(Score::getLessonLevel))
         .map(ScoreDto::new)
         .collect(Collectors.toList());
     log.info("[Get Scores][User Id : {}][start : {}][end : {}][Elapsed Time : {}]", userId, startDate, endDate, calculateElapsedTime(start));
