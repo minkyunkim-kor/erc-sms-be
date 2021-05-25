@@ -127,7 +127,7 @@ public class BillService {
         if (summary.getDepositMethod().equals("CARD")) {
           vo.setCard(vo.getCard() + summary.getTotalDeposit());
         } else if (summary.getDepositMethod().equals("CASH")) {
-          vo.setCard(vo.getCash() + summary.getTotalDeposit());
+          vo.setCash(vo.getCash() + summary.getTotalDeposit());
         }
       }
       billSummaryVos.add(vo);
