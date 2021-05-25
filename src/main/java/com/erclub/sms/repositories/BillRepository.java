@@ -16,7 +16,7 @@ public interface BillRepository extends JpaRepository<Bill, String> {
 
   @Query("SELECT targetMonth as targetMonth, depositMethod as depositMethod, SUM(tuition) AS totalTuition, SUM(bookPrice) as totalBookPrice, SUM(deposit) as totalDeposit " +
       "FROM Bill " +
-      "WHERE studentId IN ?1 AND SUBSTRING(targetMonth, 1, 4) = ?2 AND depositMethod <> '' " +
+      "WHERE studentId IN ?1 AND SUBSTRING(targetMonth, 1, 4) = ?2 " +
       "GROUP BY targetMonth, depositMethod")
   Optional<List<BillYearlySummary>> findYearlySummaryByStudentIdInAndYear(List<String> studentIds, String year);
 
