@@ -34,7 +34,12 @@ public class BillService {
   public List<Bill> getBills(String userId, String targetMonth) {
     Map<String, Student> students = studentService.getStudents(userId)
         .stream()
-        .filter(student -> !LocalDate.parse(student.getRegisteredDate()).isAfter(LocalDate.parse(targetMonth + "-01")))
+        .filter(
+            student -> !LocalDate.parse(student.getRegisteredDate())
+                .isAfter(
+                    LocalDate.parse(targetMonth + "-01").plusMonths(1)
+                )
+        )
         .collect(Collectors.toMap(Student::getStudentId, student -> student));
 
     Map<String, Bill> billMap =
