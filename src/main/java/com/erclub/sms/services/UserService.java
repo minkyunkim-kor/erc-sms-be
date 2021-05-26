@@ -47,6 +47,7 @@ public class UserService {
       }
       user.get().setLoginId(request.getId());
       user.get().setPwd(passwordEncoder.encode(request.getPw()));
+      user.get().setTeacher(request.getTeacher());
       user.get().setName(request.getName());
       user.get().setSuspendYn(request.getSuspendYn());
       userRepository.save(user.get());

@@ -1,5 +1,6 @@
 package com.erclub.sms.api.dto;
 
+import com.erclub.sms.common.domain.STUDENT_CATEGORY;
 import com.erclub.sms.common.domain.WEEKDAY;
 import com.erclub.sms.models.Lesson;
 import com.erclub.sms.models.LessonDetail;
@@ -25,6 +26,7 @@ public class LessonDto {
   public LessonDto(Lesson lesson) {
     List<String> students = lesson.getStudents()
             .stream()
+            .filter(s -> STUDENT_CATEGORY.WITHDRAWAL.getValue() != s.getCategory())
             .map(Student::getNameKo)
             .collect(Collectors.toList());
     lessonId = lesson.getLessonId();

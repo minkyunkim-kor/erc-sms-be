@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 public class UserDto {
   private String userId;
   private String id;
+  private String teacher;
   private String name;
   private String suspendYn;
 
   public UserDto(ErcUser user) {
-    this(user.getUserId(), user.getLoginId(), user.getName(), user.getSuspendYn());
+    this(user.getUserId(), user.getLoginId(), user.getTeacher(), user.getName(), user.getSuspendYn());
   }
 }

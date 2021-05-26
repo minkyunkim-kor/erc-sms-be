@@ -1,6 +1,7 @@
 package com.erclub.sms.services;
 
 import com.erclub.sms.api.request.SaveScoreRequest;
+import com.erclub.sms.common.domain.STUDENT_CATEGORY;
 import com.erclub.sms.common.exception.CommonException;
 import com.erclub.sms.models.*;
 import com.erclub.sms.repositories.LevelTestRepository;
@@ -22,14 +23,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class ScoreService {
   private final ScoreRepository scoreRepository;
   private final StudentService studentService;
-  private final ScoreExtraRepository scoreExtraRepository;
   private final LessonService lessonService;
   private final LevelTestRepository levelTestRepository;
 
-  public ScoreService(ScoreRepository scoreRepository, StudentService studentService, ScoreExtraRepository scoreExtraRepository, LessonService lessonService, LevelTestRepository levelTestRepository) {
+  public ScoreService(ScoreRepository scoreRepository, StudentService studentService, LessonService lessonService, LevelTestRepository levelTestRepository) {
     this.scoreRepository = scoreRepository;
     this.studentService = studentService;
-    this.scoreExtraRepository = scoreExtraRepository;
     this.lessonService = lessonService;
     this.levelTestRepository = levelTestRepository;
   }
@@ -70,14 +69,17 @@ public class ScoreService {
     if (lessons.isEmpty()) return new ArrayList<>();
     Map<String, Student> students = studentService.getStudents(userId)
         .stream()
-        .filter(student -> lessons.containsValue(student.getLesson()))
+        .filter(
+            student -> (lessons.containsValue(student.getLesson())) &&
+                STUDENT_CATEGORY.WITHDRAWAL.getValue() != student.getCategory()
+        )
         .collect(Collectors.toMap(Student::getStudentId, student -> student));
     if (students.isEmpty()) return new ArrayList<>();
     List<String> studentIds = new ArrayList<>(students.keySet());
-    Map<String, ScoreExtra> scoreExtras =
-        scoreExtraRepository.findByStudentIdIn(studentIds).orElseGet(ArrayList::new)
+    Map<String, String> lastLevels =
+        scoreRepository.findLastLevelByStudentIdIn(studentIds).orElseGet(ArrayList::new)
         .stream()
-        .collect(Collectors.toMap(ScoreExtra::getStudentId, scoreExtra -> scoreExtra));
+        .collect(Collectors.toMap(LastLevel::getStudentId, LastLevel::getLastLevel));
     Map<String, Score> scores =
         scoreRepository.findByStudentIdInAndTargetDate(studentIds, targetDate).orElseGet(ArrayList::new)
         .stream()
@@ -95,11 +97,17 @@ public class ScoreService {
         if(StringUtils.isBlank(score.getTeacher())) {
           score.setTeacher(lessons.get(student.getLesson().getLessonId()).getTeacherName());
         }
-      } else if (scoreExtras.containsKey(student.getStudentId())) {
-        score.setLessonLevel(scoreExtras.get(student.getStudentId()).getLastLessonLevel());
+      } else if (lastLevels.containsKey(student.getStudentId())) {
+        score.setLessonLevel(lastLevels.get(student.getStudentId()));
       } else {
         Optional<LevelTest> levelTest = levelTestRepository.findById(student.getStudentId());
-        score.setLessonLevel(levelTest.map(test -> test.getInitLevelA() + test.getInitLevelB()).orElse(""));
+        score.setLessonLevel(
+            levelTest.map(
+                test ->
+                    Optional.ofNullable(test.getInitLevelA()).orElse("") +
+                        Optional.ofNullable(test.getInitLevelB()).orElse("")
+            ).orElse("")
+        );
       }
       result.add(score);
     }
@@ -112,10 +120,10 @@ public class ScoreService {
         .stream()
         .collect(Collectors.toMap(Student::getStudentId, student -> student));
     if (students.isEmpty()) return new ArrayList<>();
-    Map<String, ScoreExtra> scoreExtras =
-        scoreExtraRepository.findByStudentIdIn(new ArrayList<>(students.keySet())).orElseGet(ArrayList::new)
+    Map<String, String> lastLevels =
+        scoreRepository.findLastLevelByStudentIdIn(new ArrayList<>(students.keySet())).orElseGet(ArrayList::new)
             .stream()
-            .collect(Collectors.toMap(ScoreExtra::getStudentId, scoreExtra -> scoreExtra));
+            .collect(Collectors.toMap(LastLevel::getStudentId, LastLevel::getLastLevel));
 
     List<Score> targets = new ArrayList<>();
     for (Student student : students.values()) {
@@ -124,8 +132,8 @@ public class ScoreService {
       score.setName(student.getNameKo());
       score.setNameEn(student.getNameEn());
       score.setTeacher(student.getLesson().getTeacherName());
-      if (scoreExtras.containsKey(student.getStudentId())) {
-        score.setLessonLevel(scoreExtras.get(student.getStudentId()).getLastLessonLevel());
+      if (lastLevels.containsKey(student.getStudentId())) {
+        score.setLessonLevel(lastLevels.get(student.getStudentId()));
       } else {
         Optional<LevelTest> levelTest = levelTestRepository.findById(student.getStudentId());
         score.setLessonLevel(levelTest.map(test -> test.getInitLevelA() + test.getInitLevelB()).orElse(""));
@@ -156,6 +164,16 @@ public class ScoreService {
         target.setScoreH(detail.getAttitude().getHomework());
         target.setScoreP(detail.getAttitude().getParticipation());
         target.setScoreM(detail.getAttitude().getManner());
+
+        if (detail.getAttitude().getAbsent() && scores.containsKey(detail.getStudentId())) {
+          target.setScoreD(null);
+          target.setScoreOF(null);
+          target.setScoreC(null);
+          target.setScoreG(null);
+          target.setScoreW(null);
+          target.setScoreS(null);
+          target.setExtra(null);
+        }
       }
 
       //학습 평가 점수 입력
@@ -175,10 +193,6 @@ public class ScoreService {
         target.setCompleted(detail.getExtra().getCompleted());
       }
       saveTargets.add(target);
-
-      if (StringUtils.isNotEmpty(target.getLessonLevel())) {
-        scoreExtraRepository.update(target.getStudentId(), target.getLessonLevel(), target.getTargetDate());
-      }
     }
     scoreRepository.saveAll(saveTargets);
   }

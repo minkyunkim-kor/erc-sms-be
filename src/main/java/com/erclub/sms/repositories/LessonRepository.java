@@ -1,5 +1,6 @@
 package com.erclub.sms.repositories;
 
+import com.erclub.sms.models.LastLevel;
 import com.erclub.sms.models.Lesson;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

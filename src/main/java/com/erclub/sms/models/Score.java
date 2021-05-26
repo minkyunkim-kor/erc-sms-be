@@ -95,6 +95,7 @@ public class Score implements Cloneable {
     scoreS = score.getScoreS();
     teacher = score.getTeacher();
     extra = score.getExtra();
+    completed = score.getCompleted();
   }
 
   protected Score(String studentId) {

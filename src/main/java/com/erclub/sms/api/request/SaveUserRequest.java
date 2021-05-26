@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class SaveUserRequest {
   private String id;
   private String pw;
+  private String teacher;
   private String name;
   private String suspendYn;
   private Boolean isNew;

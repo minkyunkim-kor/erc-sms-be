@@ -24,6 +24,7 @@ public class ScoreTargetDto {
   private Integer scoreS;
   private String teacher;
   private String comment;
+  private boolean completed;
 
   public ScoreTargetDto(Score score) {
     studentId = score.getStudentId();
@@ -43,5 +44,6 @@ public class ScoreTargetDto {
     scoreS = score.getScoreS();
     teacher = score.getTeacher();
     comment = score.getExtra();
+    completed = null != score.getCompleted() ? score.getCompleted() : false;
   }
 }

@@ -3,6 +3,7 @@ package com.erclub.sms.api;
 import com.erclub.sms.api.dto.*;
 import com.erclub.sms.api.request.*;
 import com.erclub.sms.common.domain.CommonResponse;
+import com.erclub.sms.common.domain.STUDENT_CATEGORY;
 import com.erclub.sms.models.Progress;
 import com.erclub.sms.models.Score;
 import com.erclub.sms.models.Student;

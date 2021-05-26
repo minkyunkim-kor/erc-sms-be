@@ -26,6 +26,9 @@ public class ErcUser implements Serializable {
   @Column(name = "PWD", nullable = false)
   private String pwd;
 
+  @Column(name = "TEACHER")
+  private String teacher;
+
   @Column(name = "NAME")
   private String name;
 
@@ -38,16 +41,17 @@ public class ErcUser implements Serializable {
   @Transient
   private String token;
 
-  protected ErcUser(String id, String pwd, String name, String suspendYn) {
+  protected ErcUser(String id, String pwd, String teacher, String name, String suspendYn) {
     userId = UUID.randomUUID().toString();
     this.loginId = id;
     this.pwd = pwd;
+    this.teacher = teacher;
     this.name = name;
     role = "USER";
     this.suspendYn = suspendYn;
   }
 
   public static ErcUser from(SaveUserRequest request) {
-    return new ErcUser(request.getId(), request.getPw(), request.getName(), request.getSuspendYn());
+    return new ErcUser(request.getId(), request.getPw(), request.getTeacher(), request.getName(), request.getSuspendYn());
   }
 }
