@@ -78,12 +78,12 @@ public class LessonService {
 
   @Transactional
   public void updateLesson(String userId, String lessonId, SaveLessonRequest request) {
-    Optional<Lesson> lesson = lessonRepository.findByUserIdAndLessonName(userId, request.getName());
+    Optional<Lesson> lesson = lessonRepository.findByUserIdAndLessonId(userId, lessonId);
     if (!lesson.isPresent()) {
       throw new CommonException(BAD_REQUEST.value(), "not found lesson info");
     }
 
-    if (!lessonId.equals(lesson.get().getLessonId())) {
+    if (lessonRepository.findByUserIdAndLessonName(userId, request.getName()).isPresent()) {
       throw new CommonException(HttpStatus.BAD_REQUEST.value(), "duplicate lesson name");
     }
 
