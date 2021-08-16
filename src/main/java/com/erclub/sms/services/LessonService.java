@@ -83,7 +83,8 @@ public class LessonService {
       throw new CommonException(BAD_REQUEST.value(), "not found lesson info");
     }
 
-    if (lessonRepository.findByUserIdAndLessonName(userId, request.getName()).isPresent()) {
+    Optional<Lesson> checkDuplicateLesson = lessonRepository.findByUserIdAndLessonName(userId, request.getName());
+    if (checkDuplicateLesson.isPresent() && !checkDuplicateLesson.get().getLessonId().equals(lessonId)) {
       throw new CommonException(HttpStatus.BAD_REQUEST.value(), "duplicate lesson name");
     }
 
