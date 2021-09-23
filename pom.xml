@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.erclub.sms</groupId>
 	<artifactId>erclub_sms</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.4</version>
 	<name>ERCLUB_SMS</name>
 	<description>ER-Club Student Management System Backend</description>
 	<properties>

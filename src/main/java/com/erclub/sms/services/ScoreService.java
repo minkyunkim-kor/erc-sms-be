@@ -131,7 +131,7 @@ public class ScoreService {
       score.setStudentId(student.getStudentId());
       score.setName(student.getNameKo());
       score.setNameEn(student.getNameEn());
-      score.setTeacher(student.getLesson().getTeacherName());
+      score.setTeacher(student.getLesson() == null ? "" : student.getLesson().getTeacherName());
       if (lastLevels.containsKey(student.getStudentId())) {
         score.setLessonLevel(lastLevels.get(student.getStudentId()));
       } else {
