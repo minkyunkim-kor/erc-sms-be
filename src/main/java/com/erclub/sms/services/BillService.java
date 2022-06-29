@@ -86,8 +86,8 @@ public class BillService {
         .collect(Collectors.toMap(Bill::getStudentId, bill -> bill));
     for (SaveBillRequest.BillData billData : request.getBillData()) {
       Bill bill = bills.getOrDefault(billData.getStudentId(), Bill.from(billData.getStudentId(), request.getTargetMonth()));
-      bill.setTuition(billData.getTuition());
-      bill.setBookPrice(billData.getBookPrice());
+      bill.setTuition(billData.getTuition() == null ? 0 : billData.getTuition());
+      bill.setBookPrice(billData.getBookPrice() == null ? 0 : billData.getBookPrice());
       bill.setExtra(billData.getComment());
       bills.put(bill.getStudentId(), bill);
     }
